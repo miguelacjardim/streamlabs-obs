@@ -14,7 +14,6 @@ const os = require('os');
 const rimraf = require('rimraf');
 
 const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
-const FAILED_TESTS_PATH = 'test-dist/failed-tests.json';
 
 export async function focusWindow(t: any, regex: RegExp): Promise<boolean> {
   const handles = await t.context.app.client.windowHandles();
@@ -234,13 +233,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   }
 
   test.beforeEach(async t => {
-    // consider this test as failed until it's not successfully finished
-    // so we can catch failures for tests with timeouts
     testName = t.title.replace('beforeEach hook for ', '');
     testPassed = false;
-    failedTests.push(testName);
-    saveFailedTestsToFile(failedTests);
-
     t.context.app = app;
     if (options.restartAppAfterEachTest || !appIsRunning) await startApp(t);
   });
@@ -270,16 +264,12 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       fail('Test finalization failed');
     }
 
-    if (testPassed) {
-      // consider this test succeed and remove from the `failedTests` list
-      removeFailedTestFromFile(failedTests.pop());
-    } else {
+    if (!testPassed) {
       fail();
       const user = getUser();
       if (user) console.log(`Test failed for the account: ${user.type} ${user.email}`);
       t.fail(failMsg);
     }
-    if (failedTests.length) saveFailedTestsToFile(failedTests);
   });
 
   test.after.always(async t => {
@@ -299,17 +289,10 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 }
 
 function saveFailedTestsToFile(failedTests: string[]) {
-  if (fs.existsSync(FAILED_TESTS_PATH)) {
+  const filePath = 'test-dist/failed-tests.json';
+  if (fs.existsSync(filePath)) {
     // tslint:disable-next-line:no-parameter-reassignment TODO
-    failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH)).concat(failedTests);
+    failedTests = JSON.parse(fs.readFileSync(filePath)).concat(failedTests);
   }
-  fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(failedTests));
-}
-
-function removeFailedTestFromFile(testName: string) {
-  if (fs.existsSync(FAILED_TESTS_PATH)) {
-    const failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH));
-    failedTests.splice(failedTests.indexOf(testName), 1);
-    fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(failedTests));
-  }
+  fs.writeFileSync(filePath, JSON.stringify(failedTests));
 }
