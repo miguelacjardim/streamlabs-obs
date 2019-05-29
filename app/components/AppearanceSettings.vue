@@ -1,6 +1,5 @@
 <template>
   <div>
-    test diff
     <div class="section">
       <div class="section-content">
         <GenericForm v-model="settingsFormData" @input="saveSettings" />
