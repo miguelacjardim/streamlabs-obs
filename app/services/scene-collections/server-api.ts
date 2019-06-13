@@ -54,6 +54,8 @@ export class SceneCollectionsServerApiService extends Service {
     const url = `${this.baseUrl}/active/scene-collection/${id}`;
     const request = new Request(url, { headers: this.headers, method: 'POST' });
 
+    console.log('MAKING COLLECTION ACTIVE: POST', url);
+
     return fetch(request).then(handleResponse);
   }
 
