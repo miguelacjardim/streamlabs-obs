@@ -17,21 +17,28 @@ test('Go through the onboarding and autoconfig', async t => {
 
   // Wait for the auth screen to appear
   await app.client.isExisting('button=Twitch');
+  console.log('auth exist');
 
   await logIn(t);
+  console.log('logged in');
 
   // This will show up if there are scene collections to import
   if (await t.context.app.client.isExisting('button=Continue')) {
+    console.log('has collections, skip it');
     await t.context.app.client.click('button=Continue');
+    console.log('skipped');
   }
 
   // This will only show up if OBS is installed
   if (await t.context.app.client.isExisting('button=Start Fresh')) {
+    console.log('obs installed');
     await t.context.app.client.click('button=Start Fresh');
+    console.log('start fresh clicked');
   }
 
   // Start auto config
   await app.client.click('button=Start');
+  console.log('start clicked');
   await app.client.waitForVisible('.button--action:not([disabled])', 60000);
   await app.client.click('button=Next');
 
