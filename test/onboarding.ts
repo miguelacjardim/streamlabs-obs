@@ -11,40 +11,43 @@ const _7z = require('7zip')['7z'];
 
 useSpectron({ skipOnboarding: false });
 
-test('Go through the onboarding and autoconfig', async t => {
-  const app = t.context.app;
-  await focusMain(t);
+for (let i = 1; i < 100; i++) {
 
-  // Wait for the auth screen to appear
-  await app.client.isExisting('button=Twitch');
-  console.log('auth exist');
+  test('Go through the onboarding and autoconfig' + i, async t => {
+    const app = t.context.app;
+    await focusMain(t);
 
-  await logIn(t);
-  console.log('logged in');
+    // Wait for the auth screen to appear
+    await app.client.isExisting('button=Twitch');
+    console.log('auth exist');
 
-  // This will show up if there are scene collections to import
-  if (await t.context.app.client.isExisting('button=Continue')) {
-    console.log('has collections, skip it');
-    await t.context.app.client.click('button=Continue');
-    console.log('skipped');
-  }
+    await logIn(t);
+    console.log('logged in');
 
-  // This will only show up if OBS is installed
-  if (await t.context.app.client.isExisting('button=Start Fresh')) {
-    console.log('obs installed');
-    await t.context.app.client.click('button=Start Fresh');
-    console.log('start fresh clicked');
-  }
+    // This will show up if there are scene collections to import
+    if (await t.context.app.client.isExisting('button=Continue')) {
+      console.log('has collections, skip it');
+      await t.context.app.client.click('button=Continue');
+      console.log('skipped');
+    }
 
-  // Start auto config
-  await app.client.click('button=Start');
-  console.log('start clicked');
-  await app.client.waitForVisible('.button--action:not([disabled])', 60000);
-  await app.client.click('button=Next');
+    // This will only show up if OBS is installed
+    if (await t.context.app.client.isExisting('button=Start Fresh')) {
+      console.log('obs installed');
+      await t.context.app.client.click('button=Start Fresh');
+      console.log('start fresh clicked');
+    }
 
-  // success?
-  t.true(await app.client.isVisible('h2=Sources'), 'Sources selector is visible');
-});
+    // Start auto config
+    await app.client.click('button=Start');
+    console.log('start clicked');
+    await app.client.waitForVisible('.button--action:not([disabled])', 60000);
+    await app.client.click('button=Next');
+
+    // success?
+    t.true(await app.client.isVisible('h2=Sources'), 'Sources selector is visible');
+  });
+}
 
 test('OBS Importer', async t => {
   const client = t.context.app.client;
