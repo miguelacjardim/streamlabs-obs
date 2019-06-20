@@ -176,6 +176,8 @@ function startApp() {
     webPreferences: { nodeIntegration: true, webviewTag: true }
   });
 
+  mainWindow.openDevTools({ mode: 'detach' });
+
   mainWindowState.manage(mainWindow);
 
   mainWindow.setMenu(null);
