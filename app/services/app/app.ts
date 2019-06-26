@@ -31,6 +31,7 @@ import { AnnouncementsService } from 'services/announcements';
 import { ObsUserPluginsService } from 'services/obs-user-plugins';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { GameOverlayService } from 'services/game-overlay';
+import { VoiceService } from 'services/voice';
 import { $t } from '../i18n';
 import { RunInLoadingMode } from './app-decorators';
 import { CustomizationService } from 'services/customization';
@@ -86,6 +87,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private obsUserPluginsService: ObsUserPluginsService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private customizationService: CustomizationService;
+  @Inject() private voiceService: VoiceService;
   private loadingPromises: Dictionary<Promise<any>> = {};
 
   private pid = require('process').pid;
@@ -186,6 +188,8 @@ export class AppService extends StatefulService<IAppState> {
     this.protocolLinksService.start(this.state.argv);
 
     await this.gameOverlayService.initialize();
+
+    this.voiceService.start();
   }
 
   @track('app_close')
