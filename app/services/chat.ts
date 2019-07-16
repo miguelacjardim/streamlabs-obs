@@ -98,7 +98,8 @@ export class ChatService extends Service {
         this.chatView.webContents.loadURL(chatUrl).catch(this.handleRedirectError);
       });
     } else {
-      const chatUrl = await service.getChatUrl(nightMode);
+      // const chatUrl = await service.getChatUrl(nightMode);
+      const chatUrl = this.userService.recentEventsUrl();
 
       this.chatView.webContents.loadURL(chatUrl).catch(this.handleRedirectError);
     }
